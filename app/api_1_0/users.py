@@ -1,7 +1,9 @@
 from flask import jsonify, request, current_app, url_for, g, abort
-from . import api
-from .. import db
+from flask_jwt import jwt_required, current_identity
+
 from ..models import User, Bucketlist, BucketlistItem
+from .. import db
+from . import api
 from .errors import bad_request, unauthorized, forbidden
 
 
@@ -14,7 +16,7 @@ def register_user():
     password = request.json.get('password')
     username = request.json.get('username')
     
-    # valideate the registration credentials:
+    # validate the registration credentials:
     if email is None or password is None:
         return bad_request("missing email or password")
     if User.query.filter_by(email=email).first() is not None:
@@ -24,10 +26,20 @@ def register_user():
     user = User(email=email, password=password, username=username)
     db.session.add(user)
     db.session.commit()
-    return jsonify(user.to_json()), 201
+    return jsonify({
+        "username": str(user),
+        "login_url": url_for('login', _external=True)
+    }), 201
 
 
-@api.route('/auth/login', methods = ['POST'])
-def login_user():
-    """ login an existing user. 
+@api.route('/users/<int:id>', methods = ['GET'])
+@jwt_required()
+def get_user(id):
+    """ Returns profile of user specifed by id. 
     """
+    user = User.query.filter_by(id=id).first()
+    if user:
+        return jsonify(user.to_json()), 200
+    else:
+        return bad_request("User does not exist")
+    

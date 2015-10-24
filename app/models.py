@@ -29,43 +29,29 @@ class User(db.Model):
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-    def generate_auth_token(self, expiry):
-        serializer = Serializer(current_app.config['SECRET_KEY'], expires_in=expiry)
-        return serializer.dumps({'id': self.id}).decode('ascii')
-
-    @staticmethod
-    def verify_auth_token(token):
-        s = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            user_data = s.loads(token)
-            return User.query.get(user_data['id'])
-        except:
-            return None
-    
     def __repr__(self):
         return self.username if self.username else self.email
 
     def to_json(self):
         """ returns a json-style dictionary representation of the user.
         """
-        json_bucketlist = {
+        json_user = {
             'username': self.username,
             'email': self.email,
             'date_joined': self.date_joined.strftime(current_app.config['DATE_TIME_FORMAT']),
             # 'bucketlists_url': url_for('api.get_bucketlists', _external=True),
-            # 'url': url_for('api.get_user', id=self.id, _external=True),
         }
-        return json_bucketlist
+        return json_user
 
 
 class Bucketlist(db.Model):
     __tablename__ = 'bucketlists'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text, index=True)
+    name = db.Column(db.Text, index=True, nullable=False)
     date_created = db.Column(db.DateTime, index=True, default=datetime.now())
     date_modified = db.Column(db.DateTime, index=True, default=datetime.now(), onupdate=datetime.now())
-    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
    
     items = db.relationship('BucketlistItem', lazy='immediate', backref=db.backref('bucketlist', lazy='select'))
 
@@ -114,7 +100,7 @@ class BucketlistItem(db.Model):
     __tablename__ = 'bucketlist_item'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.Text, index=True)
+    name = db.Column(db.Text, index=True, nullable=False)
     date_created = db.Column(db.DateTime, index=True, default=datetime.now())
     date_modified = db.Column(db.DateTime, index=True, default=datetime.now(), onupdate=datetime.now())
     bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'), nullable=False)

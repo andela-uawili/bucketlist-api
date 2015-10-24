@@ -3,8 +3,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 
 from config import config
 
-
-
 # instantiate 'app-facing' flask extensions:
 db = SQLAlchemy()
 
@@ -26,10 +24,14 @@ def create_app(config_name):
     # run any config level initialization:
     current_config.init_app(app)
 
-    # initialize extensions:
+    # initialize sqlalchemy on the app:
     db.init_app(app)
 
-    # reister blueprints:
+    # initialize jwt on the app:
+    from .api_1_0.authentication import jwt
+    jwt.init_app(app)
+
+    # register api blueprint:
     from .api_1_0 import api as api_1_0_blueprint
     app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1.0')
 

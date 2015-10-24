@@ -1,19 +1,33 @@
 import os
+from datetime import timedelta
+
+
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
     
     SECRET_KEY = os.environ.get('BUCKETLIST_SECRET_KEY') or 'dsbjgnkslmtdjtsdklnrjsjfesn94apw83'
+    
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
-    AUTH_TOKEN_EXPIRATION = 3600
-    USER_UID_LENGTH = 10
-    USER_UID_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ012345679'
+
+    JWT_AUTH_USERNAME_KEY = 'email'
+    JWT_AUTH_PASSWORD_KEY = 'password'
+    JWT_EXPIRATION_DELTA = timedelta(hours=1)
+    JWT_AUTH_URL_RULE = '/api/v1.0/auth/login'
+    JWT_AUTH_URL_OPTIONS = {
+        'endpoint': 'login',
+        'methods': ['POST']
+    }
+
     DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+
     @staticmethod
     def init_app(app):
         # Any config level initialization can be done here, not needed for now!
         pass
+        
         
 class DevelopmentConfig(Config):
     DEBUG = True
