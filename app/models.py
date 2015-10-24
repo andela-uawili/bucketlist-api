@@ -85,7 +85,7 @@ class Bucketlist(db.Model):
         name = json_bucketlist.get('name')
         if name:
             bucketlist.name = name
-    
+
         return bucketlist
 
 
@@ -116,12 +116,15 @@ class BucketlistItem(db.Model):
         """ creates a new bucketlist item or updates an existing one from
             a json-style representation.
         """
+        # create new:
         bucketlist_item = BucketlistItem()
         
         # update the item with the json values:
-        for field_name in json_bucketlist_item:
-            try:
-                setattr(bucketlist_item, field_name, json_bucketlist_item.get(field_name))
-            except:
-                pass
+        name = json_bucketlist_item.get('name')
+        done = json_bucketlist_item.get('done')
+        if name:
+            bucketlist_item.name = name
+        if isinstance(done, bool):
+            bucketlist_item.done = done
+        
         return bucketlist_item

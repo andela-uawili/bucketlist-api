@@ -1,7 +1,7 @@
 from flask import jsonify, request, current_app, url_for, g
 from flask_jwt import jwt_required, current_identity
 
-from ..models import User, Bucketlist, BucketlistItem
+from ..models import Bucketlist
 from .. import db
 from . import api
 from .errors import bad_request, unauthorized, forbidden, not_found
@@ -29,13 +29,12 @@ def get_bucketlist(id):
     """ get an existing bucketlist. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.get(id)
-
-    # ensure the bucketlist belongs to current user:
+    bucketlist = Bucketlist.query.\
+                 filter_by(created_by=current_identity).\
+                 filter_by(id=id).\
+                 first()
     if not bucketlist:
         return not_found('Item does not exist')
-    if not bucketlist.created_by == current_identity:
-        return forbidden('Invalid permissions')
     
     # return the json response:
     return jsonify({
@@ -74,13 +73,12 @@ def update_bucketlist(id):
     """ updates an existing bucketlist. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.get(id)
-
-    # ensure the bucketlist belongs to current user:
+    bucketlist = Bucketlist.query.\
+                 filter_by(created_by=current_identity).\
+                 filter_by(id=id).\
+                 first()
     if not bucketlist:
         return not_found('Item does not exist')
-    if not bucketlist.created_by == current_identity:
-        return forbidden('Invalid permissions')
 
     # update it with the json values:
     json_bucketlist = request.json
@@ -106,14 +104,14 @@ def delete_bucketlist(id):
     """ deletes an existing bucketlist. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.get(id)
-    # ensure the bucketlist belongs to current user:
+    bucketlist = Bucketlist.query.\
+                 filter_by(created_by=current_identity).\
+                 filter_by(id=id).\
+                 first()
     if not bucketlist:
         return not_found('Item does not exist')
-    if not bucketlist.created_by == current_identity:
-        return forbidden('Invalid permissions')
 
-    # delete the bucketlist to the db:
+    # delete the bucketlist from the db:
     db.session.delete(bucketlist)
     db.session.commit()
 
