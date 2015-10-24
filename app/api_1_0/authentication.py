@@ -1,4 +1,4 @@
-from flask import g, jsonify
+from flask import jsonify, url_for, g
 from flask_jwt import JWT
 
 from ..models import User
@@ -38,6 +38,6 @@ def auth_response(access_token, identity):
     """
     return jsonify({
         'access_token': access_token.decode('utf-8'),
-        'profile': identity.to_json()
+        'profile': identity.to_json(),
+        'bucketlists_url': url_for('api.get_bucketlists', _external=True),
     })
-    return unauthorized(error.error)

@@ -1,4 +1,4 @@
-from flask import jsonify, request, current_app, url_for, g, abort
+from flask import jsonify, request, current_app, url_for, g
 from flask_jwt import jwt_required, current_identity
 
 from ..models import User, Bucketlist, BucketlistItem
@@ -39,7 +39,9 @@ def get_user(id):
     """
     user = User.query.filter_by(id=id).first()
     if user:
-        return jsonify(user.to_json()), 200
+        return jsonify({
+            'profile': user.to_json(),
+            'bucketlists_url': url_for('api.get_bucketlists', _external=True),
+        }), 200
     else:
         return bad_request("User does not exist")
-    

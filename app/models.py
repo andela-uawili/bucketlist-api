@@ -39,7 +39,7 @@ class User(db.Model):
             'username': self.username,
             'email': self.email,
             'date_joined': self.date_joined.strftime(current_app.config['DATE_TIME_FORMAT']),
-            # 'bucketlists_url': url_for('api.get_bucketlists', _external=True),
+            'url': url_for('api.get_user', id=self.id, _external=True),
         }
         return json_user
 
@@ -78,21 +78,14 @@ class Bucketlist(db.Model):
         """ creates a new bucketlist or updates an existing one from
             a json-style representation.
         """
-        id = json_bucketlist.get('id')
-        if id:
-            bucketlist = Bucketlist.query.filter_by(id=id).first()
-            if not bucketlist:
-                raise ValidationError('item does not exist')
-        else:
-            bucketlist = Bucketlist()
-            bucketlist.created_by = g.current_user
-            
+        # create new:
+        bucketlist = Bucketlist()
+        
         # update the item with the json values:
-        for field_name in json_bucketlist:
-            try:
-                setattr(bucketlist, field_name, json_bucketlist.get(field_name))
-            except:
-                pass
+        name = json_bucketlist.get('name')
+        if name:
+            bucketlist.name = name
+    
         return bucketlist
 
 
@@ -123,14 +116,7 @@ class BucketlistItem(db.Model):
         """ creates a new bucketlist item or updates an existing one from
             a json-style representation.
         """
-        id = json_bucketlist_item.get('id')
-        if id:
-            bucketlist_item = BucketlistItem.query.filter_by(id=id).first()
-            if not bucketlist_item:
-                raise ValidationError('item does not exist')
-        else:
-            bucketlist_item = BucketlistItem()
-            bucketlist_item.created_by = g.current_user
+        bucketlist_item = BucketlistItem()
         
         # update the item with the json values:
         for field_name in json_bucketlist_item:

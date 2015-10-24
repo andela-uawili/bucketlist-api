@@ -1,4 +1,4 @@
 
 
-class ValidationError(ValueError):
+class ValidationError(BaseException):
     pass
