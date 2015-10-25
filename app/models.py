@@ -15,8 +15,12 @@ class User(db.Model):
     username = db.Column(db.Text, nullable=True)
     date_joined = db.Column(db.DateTime, index=True, default=datetime.now)
     
-    bucketlists = db.relationship('Bucketlist', lazy='dynamic', backref=db.backref('created_by', lazy='select'))
-
+    bucketlists = db.relationship(
+        'Bucketlist', 
+        lazy='dynamic', 
+        backref=db.backref('created_by', lazy='select'),
+        cascade='all, delete-orphan'
+    )
 
     @property
     def password(self):
@@ -53,7 +57,12 @@ class Bucketlist(db.Model):
     date_modified = db.Column(db.DateTime, index=True, default=datetime.now(), onupdate=datetime.now())
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
    
-    items = db.relationship('BucketlistItem', lazy='immediate', backref=db.backref('bucketlist', lazy='select'))
+    items = db.relationship(
+        'BucketlistItem', 
+        lazy='immediate', 
+        backref=db.backref('bucketlist', lazy='select'),
+        cascade='all, delete-orphan'
+    )
 
     def to_json(self):
         """ returns a json-style dictionary representation of the bucketlist
