@@ -1,7 +1,7 @@
 from flask import jsonify, request, current_app, url_for, g
 from flask_jwt import jwt_required, current_identity
 
-from ..models import User, Bucketlist, BucketlistItem
+from ..models import User
 from .. import db
 from . import api
 from .errors import bad_request, unauthorized, forbidden
@@ -20,7 +20,7 @@ def register_user():
     if email is None or password is None:
         return bad_request("missing email or password")
     if User.query.filter_by(email=email).first() is not None:
-         abort(400) # existing user
+        return forbidden("email not allowed to register")
     
     # create the user and save to the db:
     user = User(email=email, password=password, username=username)
