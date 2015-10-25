@@ -10,15 +10,46 @@ from .errors import bad_request, unauthorized, forbidden, not_found
 @api.route('/bucketlists/', methods = ['GET'])
 @jwt_required()
 def get_bucketlists():
-    """ get all bucketlists for the current user. 
+    """ gets all [or searches] the bucketlists created by the current user. 
     """
-    # get user's bucketlists:
-    bucketlists = Bucketlist.query.filter_by(created_by=current_identity)
+    # fetch the pagination options:
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('limit', current_app.config['DEFAULT_PER_PAGE'], type=int)
+    
+    # ensure that items per page does not pass the maximum:
+    max_per_page = current_app.config['MAX_PER_PAGE']
+    if per_page > max_per_page:
+        per_page = max_per_page
+
+    # fetch any search key specified:
+    q = request.args.get('q', "", type=str)
+
+    # paginate user's [searched] bucketlists:
+    pagination = Bucketlist.query.\
+                 filter_by(created_by=current_identity).\
+                 filter(Bucketlist.name.like("%{}%".format(q))).\
+                 paginate( page,
+                           per_page=per_page,
+                           error_out=False)
+    
+    # get current page of user's bucketlists:
+    bucketlists = pagination.items
+    
+    # get url to the previous page:
+    prev_url = url_for('api.get_bucketlists', page=page-1, _external=True)\
+               if pagination.has_prev else None
+    
+    # get url for the next page:
+    next_url = url_for('api.get_bucketlists', page=page+1, _external=True)\
+               if pagination.has_next else None
     
     # return the json response:
     return jsonify({
         "bucketlists": [bucketlist.to_json() for bucketlist in bucketlists],
-        "bucketlists_url": url_for('api.get_bucketlists', _external=True)
+        "current_page": page,
+        "total": pagination.total,
+        "next_url": next_url,
+        "prev_url": prev_url,
     }), 200
 
 
@@ -28,6 +59,7 @@ def get_bucketlists():
 def get_bucketlist(id):
     """ get an existing bucketlist. 
     """
+
     # get the bucketlist:
     bucketlist = Bucketlist.query.\
                  filter_by(created_by=current_identity).\
@@ -35,10 +67,55 @@ def get_bucketlist(id):
                  first()
     if not bucketlist:
         return not_found('Item does not exist')
+
+    # get its items as a queryset (because lazy='dynamic'):
+    bucketlist_items_query = bucketlist.items
+
+    # fetch the pagination options:
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('limit', current_app.config['DEFAULT_PER_PAGE'], type=int)
     
+    # ensure that items per page does not pass the maximum:
+    max_per_page = current_app.config['MAX_PER_PAGE']
+    if per_page > max_per_page:
+        per_page = max_per_page
+
+    # paginate user's [searched] bucketlists:
+    pagination = bucketlist_items_query.paginate( page, per_page=per_page, error_out=False)
+    
+    # get current page of user's bucketlists:
+    bucketlist_items = pagination.items
+    
+    # get url to the previous page:
+    prev_url = None
+    if pagination.has_prev:
+        prev_url = url_for('api.get_bucketlist', 
+                            id=bucketlist.id,  
+                            page=page-1, 
+                            limit=per_page, 
+                            _external=True)
+    
+    # get url for the next page:
+    next_url = None
+    if pagination.has_next:
+        next_url = url_for('api.get_bucketlist', 
+                            id=bucketlist.id, 
+                            page=page+1, 
+                            limit=per_page, 
+                            _external=True)
+    
+    # get 
+    bucketlist_json = bucketlist.to_json()
+    bucketlist_json['items'] = [bucketlist_item.to_json() for bucketlist_item in bucketlist_items]
+
+
     # return the json response:
     return jsonify({
-        "bucketlist": bucketlist.to_json(),
+        "bucketlist": bucketlist_json,
+        "current_page": page,
+        "total": pagination.total,
+        "next_url": next_url,
+        "prev_url": prev_url,
         "bucketlists_url": url_for('api.get_bucketlists', _external=True)
     }), 200
 

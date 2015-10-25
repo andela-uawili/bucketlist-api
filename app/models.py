@@ -58,19 +58,19 @@ class Bucketlist(db.Model):
    
     items = db.relationship(
         'BucketlistItem', 
-        lazy='immediate', 
+        lazy='dynamic', 
         backref=db.backref('bucketlist', lazy='select'),
         cascade='all, delete-orphan'
     )
 
-    def to_json(self):
+    def to_json(self, with_items=False):
         """ returns a json-style dictionary representation of the bucketlist
             and it's associated items.
         """
         json_bucketlist = {
             'id': self.id,
             'name': self.name,
-            'items': [item.to_json() for item in self.items],
+            'item_count': len(self.items.all()),
             'date_created': self.date_created.strftime(current_app.config['DATE_TIME_FORMAT']),
             'date_modified': self.date_modified.strftime(current_app.config['DATE_TIME_FORMAT']),
             'created_by': {
