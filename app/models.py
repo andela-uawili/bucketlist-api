@@ -40,6 +40,7 @@ class User(db.Model):
         """ returns a json-style dictionary representation of the user.
         """
         json_user = {
+            'id': self.id,
             'username': self.username,
             'email': self.email,
             'date_joined': self.date_joined.strftime(current_app.config['DATE_TIME_FORMAT']),
@@ -71,7 +72,7 @@ class Bucketlist(db.Model):
         json_bucketlist = {
             'id': self.id,
             'name': self.name,
-            'item_count': len(self.items.all()),
+            'item_count': self.items.count(),
             'date_created': self.date_created.strftime(current_app.config['DATE_TIME_FORMAT']),
             'date_modified': self.date_modified.strftime(current_app.config['DATE_TIME_FORMAT']),
             'created_by': {

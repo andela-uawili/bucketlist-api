@@ -1,4 +1,3 @@
-import logging
 from collections import OrderedDict
 
 from flask import jsonify, url_for, g
@@ -12,8 +11,6 @@ from .errors import bad_request, unauthorized, forbidden
 # create an instance of flask-jwt:
 jwt = JWT()
 
-# create the error handler logger:
-logger = logging.getLogger(__name__)
 
 # define the flask-jwt callbacks:
 
@@ -64,13 +61,11 @@ def jwt_error_handler(error):
     """ overrides the built-in flask-jwt error FILE_UPLOAD_HANDLERS
         to add support for logged-in status reporting.
     """
-    logger.error(error)
-
     if error.error == 'Invalid JWT':
         error.description = 'User not logged in or does not exist'
 
-    return jsonify(OrderedDict([
-        ('status_code', error.status_code),
-        ('error', error.error),
-        ('description', error.description),
-    ])), error.status_code, error.headers
+    return jsonify({
+        'status_code': error.status_code,
+        'error': error.error,
+        'description': error.description,
+    }), error.status_code, error.headers

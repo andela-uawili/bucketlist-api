@@ -39,10 +39,6 @@ def register_user():
 def logout():
     """ Logs the current user out. 
     """
-    # validate logged_in status:
-    if not current_identity.logged_in:
-        return forbidden("user not logged in")
-    
     # set the logged-in status flag for the user:
     current_identity.logged_in = False
     db.session.add(current_identity)
@@ -52,7 +48,7 @@ def logout():
     return jsonify({
         'status': 'logged out',
         'login_url': url_for('login', _external=True)
-    }), 201
+    }), 200
 
 
 @api.route('/users/<int:id>', methods = ['GET'])
