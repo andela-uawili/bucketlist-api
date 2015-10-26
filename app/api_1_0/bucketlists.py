@@ -53,7 +53,6 @@ def get_bucketlists():
     }), 200
 
 
-
 @api.route('/bucketlists/<int:id>', methods = ['GET'])
 @jwt_required()
 def get_bucketlist(id):
@@ -120,7 +119,6 @@ def get_bucketlist(id):
     }), 200
 
 
-
 @api.route('/bucketlists/', methods = ['POST'])
 @jwt_required()
 def create_bucketlist():
@@ -141,7 +139,6 @@ def create_bucketlist():
         "bucketlist": bucketlist.to_json(),
         "bucketlists_url": url_for('api.get_bucketlists', _external=True)
     }), 201
-
 
 
 @api.route('/bucketlists/<int:id>', methods = ['PUT'])
@@ -172,7 +169,6 @@ def update_bucketlist(id):
         "bucketlist": bucketlist.to_json(),
         "bucketlists_url": url_for('api.get_bucketlists', _external=True)
     }), 200
-
 
 
 @api.route('/bucketlists/<int:id>', methods = ['DELETE'])
