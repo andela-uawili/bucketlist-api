@@ -45,11 +45,10 @@ class AuthenticationTestCase(unittest.TestCase):
         }
     
 
-    def test_user_registration(self):
-        """ Tests user registration with and without specifying username.
+    def test_user_can_register_with_username(self):
+        """ Tests user registration specifying username.
             POST '/auth/register'
         """
-        # register user properly:
         response = self.client.post(
             url_for('api.register_user', _external=True),
             headers=self.get_api_headers(),
@@ -65,7 +64,10 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertIn( url_for('login'), response.data)
 
 
-        # register user without username:
+    def test_user_can_register_without_username(self):
+        """ Tests user registration without specifying username.
+            POST '/auth/register'
+        """
         response = self.client.post(
             url_for('api.register_user'),
             headers=self.get_api_headers(),
@@ -79,7 +81,11 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertEqual(response_data.get('username'), "wizkid@somedomain.com")
         self.assertIn( url_for('login'), response.data)
 
-        # register user without password:
+
+    def test_register_user_without_password_forbidden(self):
+        """ Tests user registration without specifying password.
+            POST '/auth/register'
+        """
         response = self.client.post(
             url_for('api.register_user'),
             headers=self.get_api_headers(),
@@ -90,12 +96,16 @@ class AuthenticationTestCase(unittest.TestCase):
         response_data = json.loads(response.data) 
         self.assertEqual(response.status_code, 400)
 
-        # register user with existing email:
+
+    def test_register_user_with_registered_email_forbidden(self):
+        """ Tests user registration with existing email forbidden.
+            POST '/auth/register'
+        """
         response = self.client.post(
             url_for('api.register_user'),
             headers=self.get_api_headers(),
             data=json.dumps({
-                'email':'lagbaja@somedomain.com',
+                'email':'somebody@somedomain.com',
                 'password': 'something',
             })
         )
@@ -103,11 +113,10 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 403)
 
 
-    def test_user_login(self):
-        """ Tests user login for registered and unregistered user.
+    def test_registered_user_login(self):
+        """ Tests user login for registered.
             POST '/auth/login'
         """
-        # log in a registered user:
         response = self.client.post(
             url_for('login'),
             headers=self.get_api_headers(),
@@ -122,7 +131,11 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertEqual(response_data.get('bucketlists_url'), url_for('api.get_bucketlists', _external=True))
         self.assertNotEqual(response_data.get('access_token'), None)
 
-        # log in an unregistered user:
+
+    def test_unregistered_user_login_forbidden(self):
+        """ Tests user login for unregistered is not allowed.
+            POST '/auth/login'
+        """
         response = self.client.post(
             url_for('login'),
             headers=self.get_api_headers(),

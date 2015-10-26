@@ -4,7 +4,7 @@ from flask import current_app, url_for
 from app import create_app, db
 from app.models import User
 
-class AuthenticationTestCase(unittest.TestCase):
+class UsersTestCase(unittest.TestCase):
     """ Testcase for the Authentication related 
     """
 
@@ -41,8 +41,6 @@ class AuthenticationTestCase(unittest.TestCase):
         )
         self.access_token = json.loads(response.data).get('access_token')
 
-        
-
 
     def tearDown(self):
         db.session.remove()
@@ -58,11 +56,10 @@ class AuthenticationTestCase(unittest.TestCase):
         }
 
 
-    def test_get_user(self):
-        """ Tests the get_user API endpoint.
+    def test_gets_user_with_valid_id(self):
+        """ Tests the get_user API endpoint with valid id
             POST '/users/<id>'
         """
-        # get user with right id:
         response = self.client.get(
             url_for('api.get_user', id=self.user.id),
             headers=self.get_api_headers(self.access_token)
@@ -75,7 +72,12 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertEqual(profile.get('url'), url_for('api.get_user', id=self.user.id, _external=True))
         self.assertEqual(response_data.get('bucketlists_url'), url_for('api.get_bucketlists', _external=True))
 
-        # get user with wrong id:
+
+    def test_get_user_with_invalid_id_forbidden(self):
+        """ Tests the get_user API endpoint with invalid id
+            POST '/users/<id>'
+        """
+        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_user', id=243),
             headers=self.get_api_headers(self.access_token)
@@ -84,11 +86,10 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
 
 
-    def test_update_user(self):
-        """ Tests the update_user API endpoint.
+    def test_updates_user_with_valid_id(self):
+        """ Tests the update_user API endpoint with valid id.
             PUT '/users/<id>'
         """
-        # update user with right id:
         response = self.client.put(
             url_for('api.get_user', id=self.user.id),
             headers=self.get_api_headers(self.access_token),
@@ -104,7 +105,11 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertEqual(profile.get('username'), 'Wizkid')
         self.assertEqual(response_data.get('bucketlists_url'), url_for('api.get_bucketlists', _external=True))
 
-        # update user with wrong id:
+
+    def test_update_user_with_invalid_id_forbidden(self):
+        """ Tests the update_user API endpoint with invalid id.
+            PUT '/users/<id>'
+        """
         response = self.client.put(
             url_for('api.get_user', id=243),
             headers=self.get_api_headers(self.access_token),
@@ -115,29 +120,33 @@ class AuthenticationTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
     
 
-    def test_deregister_user(self):
-        """ Tests the deregister_user API endpoint.
+    def test_deregisters_user_with_valid_id(self):
+        """ Tests the deregister_user API endpoint with a valid id.
             DELETE '/users/<id>'
         """
-        # deregister user with right id:
+        # deregister user :
         response = self.client.delete(
             url_for('api.get_user', id=self.user.id),
             headers=self.get_api_headers(self.access_token)
         )
         response_data = json.loads(response.data)
-        
+    
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data.get('status'), 'deregistered')
         self.assertEqual(response_data.get('registration_url'), url_for('api.register_user', _external=True))
         self.assertEqual(User.query.get(self.user.id), None)
 
-        # deregister user with wrong id:
+    
+    def test_deregister_user_with_invalid_id_forbidden(self):
+        """ Tests the deregister_user API endpoint.
+            DELETE '/users/<id>'
+        """
         response = self.client.delete(
             url_for('api.get_user', id=243),
             headers=self.get_api_headers(self.access_token)
         )
         response_data = json.loads(response.data)
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 400)
 
 
 if __name__ == '__main__':

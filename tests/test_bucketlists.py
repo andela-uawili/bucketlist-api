@@ -2,7 +2,7 @@ import unittest
 import json
 from flask import current_app, url_for
 from app import create_app, db
-from app.models import User
+from app.models import User, Bucketlist
 
 class AuthenticationTestCase(unittest.TestCase):
     """ Testcase for the Authentication related 
@@ -40,8 +40,6 @@ class AuthenticationTestCase(unittest.TestCase):
             })
         )
         self.access_token = json.loads(response.data).get('access_token')
-
-        
 
 
     def tearDown(self):
