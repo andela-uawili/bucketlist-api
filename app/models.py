@@ -12,7 +12,7 @@ class User(db.Model):
     email = db.Column(db.Text, index=True, unique=True)
     password_hash = db.Column(db.Text)
     username = db.Column(db.Text, nullable=True)
-    date_joined = db.Column(db.DateTime, index=True, default=datetime.now)
+    date_joined = db.Column(db.DateTime, index=True, default=datetime.now())
     logged_in = db.Column(db.Boolean, default=False)
 
     bucketlists = db.relationship(
