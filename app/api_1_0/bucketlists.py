@@ -27,7 +27,7 @@ def get_bucketlists():
     # paginate user's [searched] bucketlists:
     pagination = Bucketlist.query.\
                  filter_by(created_by=current_identity).\
-                 filter(Bucketlist.name.like("%{}%".format(q))).\
+                 filter(Bucketlist.name.ilike("%{}%".format(q))).\
                  paginate( page,
                            per_page=per_page,
                            error_out=False)

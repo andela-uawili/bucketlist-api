@@ -109,4 +109,4 @@ def delete_bucketlist_item(id, item_id):
     return jsonify({
         "status": "deleted",
         "bucketlist_url": url_for('api.get_bucketlist', id=bucketlist.id, _external=True)
-    }), 200
+    }), 200 

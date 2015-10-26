@@ -39,7 +39,6 @@ def register_user():
 def logout():
     """ Logs the current user out. 
     """
-    
     # validate logged_in status:
     if not current_identity.logged_in:
         return forbidden("user not logged in")
