@@ -127,6 +127,7 @@ def create_bucketlist():
     # get new bucketlist:
     bucketlist = Bucketlist.from_json(request.json)
 
+    # ensure a bucketlist has a name:
     if not bucketlist.name:
         return bad_request('A bucketlist must have a name')
 

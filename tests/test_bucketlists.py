@@ -264,7 +264,6 @@ class BucketlistsTestCase(unittest.TestCase):
                 'name': 'The Mel-Sans Wishlist',
             })
         )
-        print response
         
         response_data = json.loads(response.data) 
         bucketlist = response_data.get('bucketlist')
@@ -290,7 +289,7 @@ class BucketlistsTestCase(unittest.TestCase):
                 'name': 'The Mel-Chols Wishlist',
             })
         )
-        self.assertEqual(response.status_code, 405)
+        self.assertIn(response.status_code, [404, 405])
 
 
     def test_delete_bucketlist_with_valid_id(self):
@@ -321,4 +320,4 @@ class BucketlistsTestCase(unittest.TestCase):
             url_for('api.delete_bucketlist', id=10),
             headers=self.get_api_headers(self.access_token),
         )
-        self.assertEqual(response.status_code, 405)
+        self.assertIn(response.status_code, [404, 405])

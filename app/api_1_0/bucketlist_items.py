@@ -23,6 +23,10 @@ def create_bucketlist_item(id):
     # get new bucketlist-item:
     bucketlist_item = BucketlistItem.from_json(request.json)
 
+    # ensure a bucketlist-item has a name:
+    if not bucketlist_item.name:
+        return bad_request('A bucketlist-item must have a name')
+
     # associate the bucketlist_item with the bucketlist:
     bucketlist_item.bucketlist = bucketlist
 
