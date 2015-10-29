@@ -4,8 +4,9 @@ from flask import current_app, url_for
 from app import create_app, db
 from app.models import User
 
+
 class AuthenticationTestCase(unittest.TestCase):
-    """ Testcase for the Authentication related 
+    """ Testcase for the Authentication related API endpoints 
     """
 
     def setUp(self):
@@ -38,6 +39,8 @@ class AuthenticationTestCase(unittest.TestCase):
 
 
     def get_api_headers(self, access_token=''):
+        """ formats the headers to be used when accessing API endpoints.
+        """
         return {
             'Authorization': "JWT {}".format(access_token),
             'Accept': 'application/json',
@@ -50,7 +53,7 @@ class AuthenticationTestCase(unittest.TestCase):
             POST '/auth/register'
         """
         response = self.client.post(
-            url_for('api.register_user', _external=True),
+            url_for('api.register_user'),
             headers=self.get_api_headers(),
             data=json.dumps({
                 'username': 'Lagbaja', 
@@ -185,7 +188,7 @@ class AuthenticationTestCase(unittest.TestCase):
         """
         # try to access a resource without token:
         response = self.client.get(
-            url_for('api.get_bucketlists', _external=True),
+            url_for('api.get_bucketlists'),
             headers=self.get_api_headers()
         )
         self.assertEqual(response.status_code, 401)
@@ -208,7 +211,7 @@ class AuthenticationTestCase(unittest.TestCase):
 
         # try to access the same resource with token:
         response = self.client.get(
-            url_for('api.get_bucketlists', _external=True),
+            url_for('api.get_bucketlists'),
             headers=self.get_api_headers(access_token=access_token)
         )
         self.assertEqual(response.status_code, 200)
@@ -224,7 +227,7 @@ class AuthenticationTestCase(unittest.TestCase):
 
         # try to access the same resource with token:
         response = self.client.get(
-            url_for('api.get_bucketlists', _external=True),
+            url_for('api.get_bucketlists'),
             headers=self.get_api_headers(access_token=access_token)
         )
         self.assertEqual(response.status_code, 401)

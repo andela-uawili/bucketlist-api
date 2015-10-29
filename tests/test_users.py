@@ -4,8 +4,9 @@ from flask import current_app, url_for
 from app import create_app, db
 from app.models import User
 
+
 class UsersTestCase(unittest.TestCase):
-    """ Testcase for the Authentication related 
+    """ Testcase for the User related API endpoints
     """
 
     def setUp(self):
@@ -49,6 +50,8 @@ class UsersTestCase(unittest.TestCase):
 
 
     def get_api_headers(self, access_token=''):
+        """ formats the headers to be used when accessing API endpoints.
+        """
         return {
             'Authorization': "JWT {}".format(access_token),
             'Accept': 'application/json',
@@ -58,7 +61,7 @@ class UsersTestCase(unittest.TestCase):
 
     def test_gets_user_with_valid_id(self):
         """ Tests the get_user API endpoint with valid id
-            POST '/users/<id>'
+            GET '/users/<id>'
         """
         response = self.client.get(
             url_for('api.get_user', id=self.user.id),
@@ -75,7 +78,7 @@ class UsersTestCase(unittest.TestCase):
 
     def test_get_user_with_invalid_id_forbidden(self):
         """ Tests the get_user API endpoint with invalid id
-            POST '/users/<id>'
+            GET '/users/<id>'
         """
         # get user with invalid id:
         response = self.client.get(

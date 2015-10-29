@@ -15,7 +15,7 @@ def get_bucketlists():
     # fetch the pagination options:
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('limit', current_app.config['DEFAULT_PER_PAGE'], type=int)
-    
+
     # ensure that items per page does not pass the maximum:
     max_per_page = current_app.config['MAX_PER_PAGE']
     if per_page > max_per_page:
@@ -36,11 +36,11 @@ def get_bucketlists():
     bucketlists = pagination.items
     
     # get url to the previous page:
-    prev_url = url_for('api.get_bucketlists', page=page-1, _external=True)\
+    prev_url = url_for('api.get_bucketlists', limit=per_page, page=page-1, _external=True)\
                if pagination.has_prev else None
     
     # get url for the next page:
-    next_url = url_for('api.get_bucketlists', page=page+1, _external=True)\
+    next_url = url_for('api.get_bucketlists', limit=per_page, page=page+1, _external=True)\
                if pagination.has_next else None
     
     # return the json response:
@@ -126,6 +126,9 @@ def create_bucketlist():
     """
     # get new bucketlist:
     bucketlist = Bucketlist.from_json(request.json)
+
+    if not bucketlist.name:
+        return bad_request('A bucketlist must have a name')
 
     # set the bucketlist creator to current user:
     bucketlist.created_by = current_identity
