@@ -1,2 +1,2 @@
-# bucketlist-api
-Restful API for a bucketlist application
+# Bucketlist-API
+Restful API service for a bucketlist application
