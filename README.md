@@ -91,14 +91,14 @@ Response data contains the user's deletion ```status``` and the ```registration_
 #### Bucket List Item: 
 
 __POST /bucketlists/:id/items/__ | Create a new item in bucket list   
-Parameters/Input data: ```{"name":"my bucketlist item", "Done":false } ```   
+Parameters/Input data: ```{"name":"my bucketlist item", "done":false } ```   
 Response data contains the created ```bucketlist_item``` and the current ```bucketlist_url```   
 
 __PUT /bucketlists/:id/items/:item_id__ | Update a bucket list item   
 Parameters/Input data:   
 :id URL parameter, represents the id of the bucketlist.   
 :item_id URL parameter,represents the id of the bucketlist item.   
-``` {"name":"update my bucketlistitem", "Done":true } ```   
+``` {"name":"update my bucketlistitem", "done":true } ```   
 Response data contains the updated ```bucketlist_item``` and the current```bucketlist_url```  
 
 __DELETE /bucketlists/:id/items/:item_id__ | Delete an item in a bucket list   
