@@ -82,7 +82,6 @@ class BucketlistsTestCase(unittest.TestCase):
             query string parameters
             GET '/bucketlists/'
         """
-        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_bucketlists'),
             headers=self.get_api_headers(self.access_token)
@@ -103,7 +102,6 @@ class BucketlistsTestCase(unittest.TestCase):
             and page_parameters query string parameters
             GET '/bucketlists/?limit=1&page=2'
         """
-        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_bucketlists', limit=1, page=2),
             headers=self.get_api_headers(self.access_token)
@@ -123,7 +121,6 @@ class BucketlistsTestCase(unittest.TestCase):
         """ Tests the get_bucketlists API endpoint with serach query string parameters
             GET '/bucketlists/?q=brooklyn'
         """
-        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_bucketlists', q='Choleric', limit=150),
             headers=self.get_api_headers(self.access_token)
@@ -145,7 +142,6 @@ class BucketlistsTestCase(unittest.TestCase):
             Page and limit params for its items are also specified
             GET '/bucketlist/3?limit=1&page=2'
         """
-        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_bucketlist', id=3, limit=1, page=2),
             headers=self.get_api_headers(self.access_token)
@@ -179,7 +175,6 @@ class BucketlistsTestCase(unittest.TestCase):
             Page and limit params for its items are also specified
             GET '/bucketlist/3?limit=150'
         """
-        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_bucketlist', id=3, limit=150),
             headers=self.get_api_headers(self.access_token)
@@ -207,7 +202,6 @@ class BucketlistsTestCase(unittest.TestCase):
             Page and limit params for its items are also specified
             GET '/bucketlist/5'
         """
-        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_bucketlist', id=5),
             headers=self.get_api_headers(self.access_token)

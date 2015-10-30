@@ -80,7 +80,6 @@ class UsersTestCase(unittest.TestCase):
         """ Tests the get_user API endpoint with invalid id
             GET '/users/<id>'
         """
-        # get user with invalid id:
         response = self.client.get(
             url_for('api.get_user', id=243),
             headers=self.get_api_headers(self.access_token)
