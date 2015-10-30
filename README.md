@@ -1,5 +1,5 @@
 
-# BucketList API
+# BucketList API [![Build Status](https://travis-ci.org/andela-uawili/bucketlist-api.svg)](https://travis-ci.org/andela-uawili/bucketlist-api)
 Flask API for a bucket list service.
 
 The service allows users to create and manage one or more bucket lists. The API is RESTful and uses Token-based Authentication (JWT) to secure the public resource endpoints from unauthorized parties. The MIME-type for content transfer on the the service is ```application/json```.
