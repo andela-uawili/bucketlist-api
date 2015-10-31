@@ -315,3 +315,9 @@ class BucketlistsTestCase(unittest.TestCase):
             headers=self.get_api_headers(self.access_token),
         )
         self.assertIn(response.status_code, [404, 405])
+
+
+
+
+if __name__ == '__main__':
+    unittest.main()

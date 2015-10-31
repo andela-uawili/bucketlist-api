@@ -13,12 +13,10 @@ def create_bucketlist_item(id):
     """ creates a new bucketlist-item in the specified bucketlist. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.\
-                 filter_by(created_by=current_identity).\
-                 filter_by(id=id).\
-                 first()
-    if not bucketlist:
-        return not_found('Item does not exist')
+    try:
+        bucketlist = Bucketlist.get_user_bucketlist(current_identity, id)
+    except Exception, e:
+        return not_found(e.message)
 
     # get new bucketlist-item:
     bucketlist_item = BucketlistItem.from_json(request.json)
@@ -48,21 +46,17 @@ def update_bucketlist_item(id, item_id):
     """ updates an existing bucketlist item. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.\
-                 filter_by(created_by=current_identity).\
-                 filter_by(id=id).\
-                 first()
-    if not bucketlist:
-        return not_found('Item does not exist')
+    try:
+        bucketlist = Bucketlist.get_user_bucketlist(current_identity, id)
+    except Exception, e:
+        return not_found(e.message)
 
     # get bucketlist-item:
-    bucketlist_item = BucketlistItem.query.\
-                      filter_by(bucketlist=bucketlist).\
-                      filter_by(id=item_id).\
-                      first()
-    if not bucketlist_item:
-        return not_found('Item does not exist')
-
+    try:
+        bucketlist_item = BucketlistItem.get_bucketlist_item(bucketlist, item_id)
+    except Exception, e:
+        return not_found(e.message)
+        
     # update it with the json values:
     json_bucketlist_item = request.json
     name = json_bucketlist_item.get('name')
@@ -90,20 +84,16 @@ def delete_bucketlist_item(id, item_id):
     """ deletes an existing bucketlist-item. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.\
-                 filter_by(created_by=current_identity).\
-                 filter_by(id=id).\
-                 first()
-    if not bucketlist:
-        return not_found('Item does not exist')
+    try:
+        bucketlist = Bucketlist.get_user_bucketlist(current_identity, id)
+    except Exception, e:
+        return not_found(e.message)
 
     # get bucketlist-item:
-    bucketlist_item = BucketlistItem.query.\
-                      filter_by(bucketlist=bucketlist).\
-                      filter_by(id=item_id).\
-                      first()
-    if not bucketlist_item:
-        return not_found('Item does not exist')
+    try:
+        bucketlist_item = BucketlistItem.get_bucketlist_item(bucketlist, item_id)
+    except Exception, e:
+        return not_found(e.message)
 
     # delete the bucketlist from the db:
     db.session.delete(bucketlist_item)

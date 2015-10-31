@@ -98,6 +98,19 @@ class Bucketlist(db.Model):
 
         return bucketlist
 
+    @staticmethod
+    def get_user_bucketlist(user, id):
+        """ Fetchs a user's bucketlist by id.
+        """
+        # get the bucketlist:
+        bucketlist = Bucketlist.query\
+                     .filter_by(created_by=user, id=id)\
+                     .first()
+        if not bucketlist:
+            raise Exception('Item does not exist')
+        
+        return bucketlist
+
 
 class BucketlistItem(db.Model):
     __tablename__ = 'bucketlist_item'
@@ -136,5 +149,18 @@ class BucketlistItem(db.Model):
             bucketlist_item.name = name
         if isinstance(done, bool):
             bucketlist_item.done = done
+        
+        return bucketlist_item
+
+    @staticmethod
+    def get_bucketlist_item(bucketlist, id):
+        """ Fetchs an item by id from a bucketlist.
+        """
+        # get bucketlist-item:
+        bucketlist_item = BucketlistItem.query\
+                          .filter_by(bucketlist=bucketlist, id=id)\
+                          .first()
+        if not bucketlist_item:
+            raise Exception('Item does not exist')
         
         return bucketlist_item

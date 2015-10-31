@@ -4,6 +4,7 @@ from flask_jwt import jwt_required, current_identity
 from ..models import Bucketlist
 from .. import db
 from . import api
+from .utils import paginate
 from .errors import bad_request, unauthorized, forbidden, not_found
 
 
@@ -12,44 +13,27 @@ from .errors import bad_request, unauthorized, forbidden, not_found
 def get_bucketlists():
     """ gets all [or searches] the bucketlists created by the current user. 
     """
-    # fetch the pagination options:
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('limit', current_app.config['DEFAULT_PER_PAGE'], type=int)
+    # fetch the pagination and search options from the request:
+    options = request.args.copy()
 
-    # ensure that items per page does not pass the maximum:
-    max_per_page = current_app.config['MAX_PER_PAGE']
-    if per_page > max_per_page:
-        per_page = max_per_page
+    # get/search user's bucketlists:
+    results = Bucketlist.query.filter_by(created_by=current_identity)
 
-    # fetch any search key specified:
-    q = request.args.get('q', "", type=str)
-
-    # paginate user's [searched] bucketlists:
-    pagination = Bucketlist.query.\
-                 filter_by(created_by=current_identity).\
-                 filter(Bucketlist.name.ilike("%{}%".format(q))).\
-                 paginate( page,
-                           per_page=per_page,
-                           error_out=False)
+    # search if key isspecified:
+    q = options.get('q', type=str)
+    if q:
+        results = results.filter(Bucketlist.name.ilike("%{}%".format(q)))
     
-    # get current page of user's bucketlists:
-    bucketlists = pagination.items
-    
-    # get url to the previous page:
-    prev_url = url_for('api.get_bucketlists', limit=per_page, page=page-1, _external=True)\
-               if pagination.has_prev else None
-    
-    # get url for the next page:
-    next_url = url_for('api.get_bucketlists', limit=per_page, page=page+1, _external=True)\
-               if pagination.has_next else None
+    # paginate the results:
+    paginated_results = paginate(results, 'api.get_bucketlists', options)
     
     # return the json response:
     return jsonify({
-        "bucketlists": [bucketlist.to_json() for bucketlist in bucketlists],
-        "current_page": page,
-        "total": pagination.total,
-        "next_url": next_url,
-        "prev_url": prev_url,
+        "bucketlists": [bucketlist.to_json() for bucketlist in paginated_results.get('items')],
+        "current_page": paginated_results.get('current_page'),
+        "total": paginated_results.get('total'),
+        "next_url": paginated_results.get('next_url'),
+        "prev_url": paginated_results.get('prev_url'),
     }), 200
 
 
@@ -58,63 +42,33 @@ def get_bucketlists():
 def get_bucketlist(id):
     """ get an existing bucketlist. 
     """
+    # fetch the pagination and search options from the request:
+    options = request.args.copy()
 
     # get the bucketlist:
-    bucketlist = Bucketlist.query.\
-                 filter_by(created_by=current_identity).\
-                 filter_by(id=id).\
-                 first()
-    if not bucketlist:
-        return not_found('Item does not exist')
+    try:
+        bucketlist = Bucketlist.get_user_bucketlist(current_identity, id)
+    except Exception, e:
+        return not_found(e.message)
 
     # get its items as a queryset (because lazy='dynamic'):
     bucketlist_items_query = bucketlist.items
 
-    # fetch the pagination options:
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('limit', current_app.config['DEFAULT_PER_PAGE'], type=int)
+    # paginate thebucketlist_items_query  results:
+    options.update({'id': id})
+    paginated_results = paginate(bucketlist_items_query, 'api.get_bucketlist', options)
     
-    # ensure that items per page does not pass the maximum:
-    max_per_page = current_app.config['MAX_PER_PAGE']
-    if per_page > max_per_page:
-        per_page = max_per_page
-
-    # paginate user's [searched] bucketlists:
-    pagination = bucketlist_items_query.paginate( page, per_page=per_page, error_out=False)
-    
-    # get current page of user's bucketlists:
-    bucketlist_items = pagination.items
-    
-    # get url to the previous page:
-    prev_url = None
-    if pagination.has_prev:
-        prev_url = url_for('api.get_bucketlist', 
-                            id=bucketlist.id,  
-                            page=page-1, 
-                            limit=per_page, 
-                            _external=True)
-    
-    # get url for the next page:
-    next_url = None
-    if pagination.has_next:
-        next_url = url_for('api.get_bucketlist', 
-                            id=bucketlist.id, 
-                            page=page+1, 
-                            limit=per_page, 
-                            _external=True)
-    
-    # get 
+    # prep the json repr:
     bucketlist_json = bucketlist.to_json()
-    bucketlist_json['items'] = [bucketlist_item.to_json() for bucketlist_item in bucketlist_items]
-
+    bucketlist_json['items'] = [bucketlist_item.to_json() for bucketlist_item in paginated_results.get('items')]
 
     # return the json response:
     return jsonify({
         "bucketlist": bucketlist_json,
-        "current_page": page,
-        "total": pagination.total,
-        "next_url": next_url,
-        "prev_url": prev_url,
+        "current_page": paginated_results.get('current_page'),
+        "total": paginated_results.get('total'),
+        "next_url": paginated_results.get('next_url'),
+        "prev_url": paginated_results.get('prev_url'),
         "bucketlists_url": url_for('api.get_bucketlists', _external=True)
     }), 200
 
@@ -151,12 +105,10 @@ def update_bucketlist(id):
     """ updates an existing bucketlist. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.\
-                 filter_by(created_by=current_identity).\
-                 filter_by(id=id).\
-                 first()
-    if not bucketlist:
-        return not_found('Item does not exist')
+    try:
+        bucketlist = Bucketlist.get_user_bucketlist(current_identity, id)
+    except Exception, e:
+        return not_found(e.message)
 
     # update it with the json values:
     json_bucketlist = request.json
@@ -181,12 +133,10 @@ def delete_bucketlist(id):
     """ deletes an existing bucketlist. 
     """
     # get the bucketlist:
-    bucketlist = Bucketlist.query.\
-                 filter_by(created_by=current_identity).\
-                 filter_by(id=id).\
-                 first()
-    if not bucketlist:
-        return not_found('Item does not exist')
+    try:
+        bucketlist = Bucketlist.get_user_bucketlist(current_identity, id)
+    except Exception, e:
+        return not_found(e.message)
 
     # delete the bucketlist from the db:
     db.session.delete(bucketlist)

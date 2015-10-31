@@ -185,7 +185,7 @@ Date: Thu, 29 October 2015 07: 36: 22 GMT
 ## Usage
 
 #### Installation
-1. Install of all package dependencies in your python setup or virtual environment.   
+1. Install all the package dependencies in your python setup or virtual environment.   
 ``` pip install -r requirements.txt ```   
 
 2. Run the database creation and migration commands:   
