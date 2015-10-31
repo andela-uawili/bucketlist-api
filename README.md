@@ -197,9 +197,11 @@ Date: Thu, 29 October 2015 07: 36: 22 GMT
 ``` python manage.py runserver ```   
 
 #### Testing
-``` python manage.py test ```   
-For tests with coverage:    
-``` coverage run --source=app manage.py test ```   
-``` coverage report ```   
+* To run tests:  
+``` python manage.py test ``` 
+  
+* For the coverage report:    
+  1. ``` coverage run --source=app manage.py test ```   
+  2. ``` coverage report ```   
 
 
