@@ -1,18 +1,28 @@
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
+from abc import ABCMeta
 
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask import current_app, request, url_for, g
 from . import db
 
 
-class User(db.Model):
-    __tablename__ = 'users'
+class BaseModel(db.Model):
+    """ Abstract base class defining common fields and 
+        methods to be used in other concrete models.
+    """
+    __abstract__ = True
 
     id = db.Column(db.Integer, primary_key=True)
+    date_created = db.Column(db.DateTime, index=True, default=datetime.now())
+    date_modified = db.Column(db.DateTime, index=True, default=datetime.now(), onupdate=datetime.now())
+
+
+class User(BaseModel):
+    __tablename__ = 'users'
+
     email = db.Column(db.Text, index=True, unique=True)
     password_hash = db.Column(db.Text)
     username = db.Column(db.Text, nullable=True)
-    date_joined = db.Column(db.DateTime, index=True, default=datetime.now())
     logged_in = db.Column(db.Boolean, default=False)
 
     bucketlists = db.relationship(
@@ -43,19 +53,16 @@ class User(db.Model):
             'id': self.id,
             'username': self.username,
             'email': self.email,
-            'date_joined': self.date_joined.strftime(current_app.config['DATE_TIME_FORMAT']),
+            'date_joined': self.date_created.strftime(current_app.config['DATE_TIME_FORMAT']),
             'url': url_for('api.get_user', id=self.id, _external=True),
         }
         return json_user
 
 
-class Bucketlist(db.Model):
+class Bucketlist(BaseModel):
     __tablename__ = 'bucketlists'
 
-    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, index=True, nullable=False)
-    date_created = db.Column(db.DateTime, index=True, default=datetime.now())
-    date_modified = db.Column(db.DateTime, index=True, default=datetime.now(), onupdate=datetime.now())
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
    
     items = db.relationship(
@@ -112,13 +119,10 @@ class Bucketlist(db.Model):
         return bucketlist
 
 
-class BucketlistItem(db.Model):
+class BucketlistItem(BaseModel):
     __tablename__ = 'bucketlist_item'
 
-    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text, index=True, nullable=False)
-    date_created = db.Column(db.DateTime, index=True, default=datetime.now())
-    date_modified = db.Column(db.DateTime, index=True, default=datetime.now(), onupdate=datetime.now())
     bucketlist_id = db.Column(db.Integer, db.ForeignKey('bucketlists.id'), nullable=False)
     done = db.Column(db.Boolean, default=False)
    
