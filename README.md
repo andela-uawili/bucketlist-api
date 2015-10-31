@@ -194,12 +194,12 @@ Date: Thu, 29 October 2015 07: 36: 22 GMT
 ``` python manage.py db upgrade ```   
 
 #### Running the Server
-``` python manage.py runserver ```
+``` python manage.py runserver ```   
 
 #### Testing
-``` python manage.py test ```
-For tests with coverage:   
-``` coverage run --source=app manage.py test ```
-``` coverage report ```
+``` python manage.py test ```   
+For tests with coverage:    
+``` coverage run --source=app manage.py test ```   
+``` coverage report ```   
 
 
