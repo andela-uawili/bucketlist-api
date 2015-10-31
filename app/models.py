@@ -54,7 +54,7 @@ class User(BaseModel):
             'username': self.username,
             'email': self.email,
             'date_joined': self.date_created.strftime(current_app.config['DATE_TIME_FORMAT']),
-            'url': url_for('api.get_user', id=self.id, _external=True),
+            'url': url_for('api.manage_user', _external=True),
         }
         return json_user
 
@@ -84,7 +84,7 @@ class Bucketlist(BaseModel):
             'date_modified': self.date_modified.strftime(current_app.config['DATE_TIME_FORMAT']),
             'created_by': {
                 'username': str(self.created_by),
-                'url': url_for('api.get_user', id=self.creator_id, _external=True),
+                'url': url_for('api.manage_user', _external=True),
             },
             'url': url_for('api.get_bucketlist', id=self.id, _external=True),
         }

@@ -99,10 +99,10 @@ def create_bucketlist():
     }), 201
 
 
-@api.route('/bucketlists/<int:id>', methods = ['PUT'])
+@api.route('/bucketlists/<int:id>', methods = ['PUT', 'DELETE'])
 @jwt_required()
-def update_bucketlist(id):
-    """ updates an existing bucketlist. 
+def manage_bucketlist(id):
+    """ updates or deletes an existing bucketlist. 
     """
     # get the bucketlist:
     try:
@@ -110,40 +110,34 @@ def update_bucketlist(id):
     except Exception, e:
         return not_found(e.message)
 
-    # update it with the json values:
-    json_bucketlist = request.json
-    name = json_bucketlist.get('name')
-    if name:
-        bucketlist.name = name
+    if request.method == 'PUT':
+        
+        # update it with the json values:
+        json_bucketlist = request.json
+        name = json_bucketlist.get('name')
+        if name:
+            bucketlist.name = name
 
-    # save the bucketlist to the db:
-    db.session.add(bucketlist)
-    db.session.commit()
+        # save the bucketlist to the db:
+        db.session.add(bucketlist)
+        db.session.commit()
 
-    # return the json response:
-    return jsonify({
-        "bucketlist": bucketlist.to_json(),
-        "bucketlists_url": url_for('api.get_bucketlists', _external=True)
-    }), 200
+        # return the json response:
+        return jsonify({
+            "bucketlist": bucketlist.to_json(),
+            "bucketlists_url": url_for('api.get_bucketlists', _external=True)
+        }), 200
 
+    elif request.method == 'DELETE':
 
-@api.route('/bucketlists/<int:id>', methods = ['DELETE'])
-@jwt_required()
-def delete_bucketlist(id):
-    """ deletes an existing bucketlist. 
-    """
-    # get the bucketlist:
-    try:
-        bucketlist = Bucketlist.get_user_bucketlist(current_identity, id)
-    except Exception, e:
-        return not_found(e.message)
+        # delete the bucketlist from the db:
+        db.session.delete(bucketlist)
+        db.session.commit()
 
-    # delete the bucketlist from the db:
-    db.session.delete(bucketlist)
-    db.session.commit()
+        # return the json response:
+        return jsonify({
+            "status": "deleted",
+            "bucketlists_url": url_for('api.get_bucketlists', _external=True)
+        }), 200
 
-    # return the json response:
-    return jsonify({
-        "status": "deleted",
-        "bucketlists_url": url_for('api.get_bucketlists', _external=True)
-    }), 200
+    

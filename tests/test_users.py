@@ -59,12 +59,12 @@ class UsersTestCase(unittest.TestCase):
         }
 
 
-    def test_gets_user_with_valid_id(self):
-        """ Tests the get_user API endpoint with valid id
-            GET '/users/<id>'
+    def test_gets_user(self):
+        """ Tests get user with valid id
+            GET '/users/'
         """
         response = self.client.get(
-            url_for('api.get_user', id=self.user.id),
+            url_for('api.manage_user'),
             headers=self.get_api_headers(self.access_token)
         )
         response_data = json.loads(response.data)
@@ -72,28 +72,16 @@ class UsersTestCase(unittest.TestCase):
         
         self.assertEqual(response.status_code, 200)
         self.assertEqual(profile.get('email'), self.user.email)
-        self.assertEqual(profile.get('url'), url_for('api.get_user', id=self.user.id, _external=True))
+        self.assertEqual(profile.get('url'), url_for('api.manage_user', _external=True))
         self.assertEqual(response_data.get('bucketlists_url'), url_for('api.get_bucketlists', _external=True))
 
 
-    def test_get_user_with_invalid_id_forbidden(self):
-        """ Tests the get_user API endpoint with invalid id
-            GET '/users/<id>'
-        """
-        response = self.client.get(
-            url_for('api.get_user', id=243),
-            headers=self.get_api_headers(self.access_token)
-        )
-        response_data = json.loads(response.data)
-        self.assertEqual(response.status_code, 400)
-
-
-    def test_updates_user_with_valid_id(self):
-        """ Tests the update_user API endpoint with valid id.
-            PUT '/users/<id>'
+    def test_updates_user(self):
+        """ Tests update user with valid id.
+            PUT '/user/'
         """
         response = self.client.put(
-            url_for('api.get_user', id=self.user.id),
+            url_for('api.manage_user'),
             headers=self.get_api_headers(self.access_token),
             data=json.dumps({
                 'username': 'Wizkid'
@@ -106,29 +94,15 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(self.user.username, 'Wizkid')
         self.assertEqual(profile.get('username'), 'Wizkid')
         self.assertEqual(response_data.get('bucketlists_url'), url_for('api.get_bucketlists', _external=True))
-
-
-    def test_update_user_with_invalid_id_forbidden(self):
-        """ Tests the update_user API endpoint with invalid id.
-            PUT '/users/<id>'
-        """
-        response = self.client.put(
-            url_for('api.get_user', id=243),
-            headers=self.get_api_headers(self.access_token),
-            data=json.dumps({
-                'username': 'Wizkid'
-            })
-        )
-        self.assertEqual(response.status_code, 400)
     
 
-    def test_deregisters_user_with_valid_id(self):
-        """ Tests the deregister_user API endpoint with a valid id.
-            DELETE '/users/<id>'
+    def test_deregisters_user(self):
+        """ Tests deregister_user.
+            DELETE '/user/'
         """
         # deregister user :
         response = self.client.delete(
-            url_for('api.get_user', id=self.user.id),
+            url_for('api.manage_user'),
             headers=self.get_api_headers(self.access_token)
         )
         response_data = json.loads(response.data)
@@ -137,18 +111,6 @@ class UsersTestCase(unittest.TestCase):
         self.assertEqual(response_data.get('status'), 'deregistered')
         self.assertEqual(response_data.get('registration_url'), url_for('api.register_user', _external=True))
         self.assertEqual(User.query.get(self.user.id), None)
-
-    
-    def test_deregister_user_with_invalid_id_forbidden(self):
-        """ Tests the deregister_user API endpoint.
-            DELETE '/users/<id>'
-        """
-        response = self.client.delete(
-            url_for('api.get_user', id=243),
-            headers=self.get_api_headers(self.access_token)
-        )
-        response_data = json.loads(response.data)
-        self.assertEqual(response.status_code, 400)
 
 
 

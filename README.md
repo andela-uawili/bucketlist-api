@@ -16,9 +16,9 @@ EndPoint |Functionality|Public Access
 POST /auth/register|Registers a new user on the service|TRUE
 POST /auth/login|Logs a user in|TRUE
 GET /auth/logout/:id|Logs out this user|FALSE
-GET /users/:id|Get the profile of this user|FALSE
-PUT /users/:id|Update the profile of this user|FALSE
-DELETE /users/:id|Delete this user account|FALSE
+GET /user/|Get the profile of this user|FALSE
+PUT /user/|Update the profile of this user|FALSE
+DELETE /user/|Delete this user account|FALSE
 POST /bucketlists/|Create a new bucket list|FALSE
 GET /bucketlists/|List all the created bucket lists|FASLE
 GET /bucketlists/:id|Get single bucket list (along with it's items)|FALSE
@@ -50,15 +50,15 @@ Logs user with :id out and returns the ```login_url```
 
 #### User:
 
-__GET /users/:id__  | Get this user's profile   
+__GET /user/__  | Get this user's profile   
 Parameters/Input data: :id URL parameter, represents the id of the currently logged in user.   
 Response data contains the user's ```profile``` and their ```bucketlists_url```   
 
-__PUT /users/:id__  | Update this user's profile   
+__PUT /user/__  | Update this user's profile   
 Parameters/Input data: :id URL parameter, represents the id of the currently logged in user.   
 Response data contains the user's updated ```profile``` and their ```bucketlists_url```   
 
-__DELETE /users/:id__  | Deregisters the user   
+__DELETE /user/__  | Deregisters the user   
 Parameters/Input data: :id URL parameter, represents the id of the currently logged in user.   
 Response data contains the deletion ```status``` and the ```registration_url```   
 
@@ -116,7 +116,7 @@ Remember the single space between the prefix and token.
 
 
 #### Search
-User can search for bucketlists by appending the ```q``` querystring parameter to the ```GET /bucketlists/``` endpoint url
+User can search for bucketlists by appending the ```q``` querystring parameter to the ```GET /bucketlists/``` endpoint url. 
 For example to search for bucketlists with the word Kilimanjaro:   
 ``` GET /bucketlists/?q=kilimanjaro ```    
 The search feature is not case sensitive.   
@@ -198,7 +198,8 @@ Date: Thu, 29 October 2015 07: 36: 22 GMT
 
 #### Testing
 ``` python manage.py test ```
-For tests with coverage:
-``` coverage run --source=app manage.py test ``` or ``` python manage.py test --coverage ``` 
+For tests with coverage:   
+``` coverage run --source=app manage.py test ```
+``` coverage report ```
 
 

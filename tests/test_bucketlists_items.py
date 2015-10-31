@@ -126,12 +126,11 @@ class BucketlistsItemsTestCase(unittest.TestCase):
 
 
     def test_update_bucketlist_item_with_valid_id_and_item_id(self):
-        """ Tests that the update_bucketlist_item API endpoint
-            when provided valid id.
+        """ Tests that the update bucketlist item when provided valid id.
             PUT '/bucketlists/<int:id>/items/<int:item_id>'
         """
         response = self.client.put(
-            url_for('api.update_bucketlist_item', id=1, item_id=2),
+            url_for('api.manage_bucketlist_item', id=1, item_id=2),
             headers=self.get_api_headers(self.access_token),
             data=json.dumps({
                 'done': True,
@@ -145,12 +144,11 @@ class BucketlistsItemsTestCase(unittest.TestCase):
 
 
     def test_update_bucketlist_item_with_invalid_id(self):
-        """ Tests that the update_bucketlist_item API endpoint
-            errors out when provided an invalid id.
+        """ Tests that the update bucketlist item errors out when provided an invalid id.
             PUT '/bucketlists/<int:id>/items/<int:item_id>'
         """
         response = self.client.put(
-            url_for('api.update_bucketlist_item', id=233, item_id=2),
+            url_for('api.manage_bucketlist_item', id=233, item_id=2),
             headers=self.get_api_headers(self.access_token),
             data=json.dumps({
                 'name': 'The Mel-Chols Wishlist',
@@ -160,12 +158,11 @@ class BucketlistsItemsTestCase(unittest.TestCase):
 
 
     def test_update_bucketlist_item_with_invalid_item_id(self):
-        """ Tests that the update_bucketlist_item API endpoint
-            errors out when provided an invalid id.
+        """ Tests that the update bucketlist item errors out when provided an invalid id.
             PUT '/bucketlists/<int:id>/items/<int:item_id>'
         """
         response = self.client.put(
-            url_for('api.update_bucketlist_item', id=1, item_id=24),
+            url_for('api.manage_bucketlist_item', id=1, item_id=24),
             headers=self.get_api_headers(self.access_token),
             data=json.dumps({
                 'name': 'The Mel-Chols Wishlist',
@@ -175,12 +172,11 @@ class BucketlistsItemsTestCase(unittest.TestCase):
 
 
     def test_delete_bucketlist_item_with_valid_id_and_item_id(self):
-        """ Tests the delete_bucketlist_item API endpoint
-            when provided valid id.
+        """ Tests the delete bucketlist_item when provided valid id.
             DELETE '/bucketlists/<int:id>/items/<int:item_id>'
         """
         response = self.client.delete(
-            url_for('api.delete_bucketlist_item', id=1, item_id=2),
+            url_for('api.manage_bucketlist_item', id=1, item_id=2),
             headers=self.get_api_headers(self.access_token)
         )
         response_data = json.loads(response.data) 
@@ -191,30 +187,6 @@ class BucketlistsItemsTestCase(unittest.TestCase):
             response_data.get('bucketlist_url'),  
             url_for('api.get_bucketlist', id=1, _external=True)
         )
-
-
-    def test_delete_bucketlist_item_with_invalid_id(self):
-        """ Tests that the delete_bucketlist API endpoint
-            errors out when provided an invalid id.
-            DELETE '/bucketlists/<int:id>/items/<int:item_id>'
-        """
-        response = self.client.delete(
-            url_for('api.delete_bucketlist_item', id=10, item_id=2),
-            headers=self.get_api_headers(self.access_token),
-        )
-        self.assertIn(response.status_code, [404, 405])
-
-
-    def test_delete_bucketlist_item_with_invalid_item_id(self):
-        """ Tests that the delete_bucketlist API endpoint
-            errors out when provided an invalid item_id.
-            DELETE '/bucketlists/<int:id>/items/<int:item_id>'
-        """
-        response = self.client.delete(
-            url_for('api.delete_bucketlist_item', id=1, item_id=234),
-            headers=self.get_api_headers(self.access_token),
-        )
-        self.assertIn(response.status_code, [404, 405])
 
 
 

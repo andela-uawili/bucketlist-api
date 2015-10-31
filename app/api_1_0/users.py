@@ -51,65 +51,44 @@ def logout():
     }), 200
 
 
-@api.route('/users/<int:id>', methods = ['GET'])
-@jwt_required(id)
-def get_user(id):
+@api.route('/user/', methods = ['GET', 'PUT', 'DELETE'])
+@jwt_required()
+def manage_user():
     """ Returns profile of user specifed by id. 
     """
-    # get the user:
-    user = User.query.get(id)
-    if not user:
-        return bad_request("User does not exist")
+    if request.method == 'GET':
 
-    # return json response:
-    return jsonify({
-        'profile': user.to_json(),
-        'bucketlists_url': url_for('api.get_bucketlists', _external=True),
-    }), 200
+        # return json response:
+        return jsonify({
+            'profile': current_identity.to_json(),
+            'bucketlists_url': url_for('api.get_bucketlists', _external=True),
+        }), 200
 
+    elif request.method == 'PUT':
 
-@api.route('/users/<int:id>', methods = ['PUT'])
-@jwt_required()
-def update_user(id):
-    """ updates an existing user. 
-    """
-    # get the user:
-    user = User.query.get(id)
-    if not user:
-        return bad_request("User does not exist")
+        # update it with the json values:
+        username = request.json.get('username')
+        if username:
+            current_identity.username = username
 
-    # update it with the json values:
-    username = request.json.get('username')
-    if username:
-        user.username = username
+        # save the user to the db:
+        db.session.add(current_identity)
+        db.session.commit()
 
-    # save the user to the db:
-    db.session.add(user)
-    db.session.commit()
+        # return the json response:
+        return jsonify({
+            "profile": current_identity.to_json(),
+            "bucketlists_url": url_for('api.get_bucketlists', _external=True)
+        }), 200
 
-    # return the json response:
-    return jsonify({
-        "profile": user.to_json(),
-        "bucketlists_url": url_for('api.get_bucketlists', _external=True)
-    }), 200
-
-
-@api.route('/users/<int:id>', methods = ['DELETE'])
-@jwt_required()
-def deregister_user(id):
-    """ Removes an existing user account. 
-    """
-    # get the user:
-    user = User.query.get(id)
-    if not user:
-        return bad_request("User does not exist")
-    
-    # remove the user from the db:
-    db.session.delete(user)
-    db.session.commit()
-    
-    # return json response:
-    return jsonify({
-        'status': 'deregistered',
-        'registration_url': url_for('api.register_user', _external=True)
-    }), 200
+    elif request.method == 'DELETE':
+        
+        # remove the user from the db:
+        db.session.delete(current_identity)
+        db.session.commit()
+        
+        # return json response:
+        return jsonify({
+            'status': 'deregistered',
+            'registration_url': url_for('api.register_user', _external=True)
+        }), 200

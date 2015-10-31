@@ -247,12 +247,11 @@ class BucketlistsTestCase(unittest.TestCase):
 
 
     def test_update_bucketlist_with_valid_id(self):
-        """ Tests that the update_bucketlist API endpoint
-            when provided valid id.
+        """ Tests update bucketlist when provided valid id.
             PUT '/bucketlists/3'
         """
         response = self.client.put(
-            url_for('api.update_bucketlist', id=1),
+            url_for('api.manage_bucketlist', id=1),
             headers=self.get_api_headers(self.access_token),
             data=json.dumps({
                 'name': 'The Mel-Sans Wishlist',
@@ -272,12 +271,11 @@ class BucketlistsTestCase(unittest.TestCase):
 
 
     def test_update_bucketlist_with_invalid_id(self):
-        """ Tests that the update_bucketlist API endpoint
-            errors out when provided an invalid id.
+        """ Tests that update bucketlist errors out when provided an invalid id.
             PUT '/bucketlists/10'
         """
         response = self.client.put(
-            url_for('api.update_bucketlist', id=10),
+            url_for('api.manage_bucketlist', id=10),
             headers=self.get_api_headers(self.access_token),
             data=json.dumps({
                 'name': 'The Mel-Chols Wishlist',
@@ -287,12 +285,11 @@ class BucketlistsTestCase(unittest.TestCase):
 
 
     def test_delete_bucketlist_with_valid_id(self):
-        """ Tests the delete_bucketlist API endpoint
-            when provided valid id.
+        """ Tests delete bucketlist when provided valid id.
             DELETE '/bucketlists/3'
         """
         response = self.client.delete(
-            url_for('api.delete_bucketlist', id=3),
+            url_for('api.manage_bucketlist', id=3),
             headers=self.get_api_headers(self.access_token)
         )
         response_data = json.loads(response.data) 
@@ -303,18 +300,6 @@ class BucketlistsTestCase(unittest.TestCase):
             response_data.get('bucketlists_url'),  
             url_for('api.get_bucketlists', _external=True)
         )
-
-
-    def test_delete_bucketlist_with_invalid_id(self):
-        """ Tests that the delete_bucketlist API endpoint
-            errors out when provided an invalid id.
-            DELETE '/bucketlists/10'
-        """
-        response = self.client.delete(
-            url_for('api.delete_bucketlist', id=10),
-            headers=self.get_api_headers(self.access_token),
-        )
-        self.assertIn(response.status_code, [404, 405])
 
 
 
