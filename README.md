@@ -51,15 +51,15 @@ Logs user with :id out and returns the ```login_url```
 #### User:
 
 __GET /user/__  | Get this user's profile   
-Parameters/Input data: :id URL parameter, represents the id of the currently logged in user.   
+Parameters/Input data: none    
 Response data contains the user's ```profile``` and their ```bucketlists_url```   
 
 __PUT /user/__  | Update this user's profile   
-Parameters/Input data: :id URL parameter, represents the id of the currently logged in user.   
+Parameters/Input data: none   
 Response data contains the user's updated ```profile``` and their ```bucketlists_url```   
 
 __DELETE /user/__  | Deregisters the user   
-Parameters/Input data: :id URL parameter, represents the id of the currently logged in user.   
+Parameters/Input data: none    
 Response data contains the deletion ```status``` and the ```registration_url```   
 
 
@@ -199,7 +199,7 @@ Date: Thu, 29 October 2015 07: 36: 22 GMT
 #### Testing
 * To run tests:  
 ``` python manage.py test ``` 
-  
+
 * For the coverage report:    
   1. ``` coverage run --source=app manage.py test ```   
   2. ``` coverage report ```   
