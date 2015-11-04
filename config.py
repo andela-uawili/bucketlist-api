@@ -18,7 +18,7 @@ class BaseConfig:
     JWT_EXPIRATION_DELTA = timedelta(hours=1)
     JWT_AUTH_USERNAME_KEY = 'email'
     JWT_AUTH_PASSWORD_KEY = 'password'
-    JWT_AUTH_URL_RULE = '/api/v1.0/auth/login'
+    JWT_AUTH_URL_RULE = '/api/v1/auth/login'
     JWT_AUTH_URL_OPTIONS = {
         'endpoint': 'login',
         'methods': ['POST'],

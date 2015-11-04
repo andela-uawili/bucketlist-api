@@ -61,3 +61,7 @@ migrations
 
 # coverage
 tmp/
+
+# mac sturvs
+.DS_Store
+bucketlist-test.sqlite-journal

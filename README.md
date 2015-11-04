@@ -7,7 +7,7 @@ The service allows users to create and manage one or more bucket lists. The API 
 
 
 ## Endpoints
-All endpoints must be prefixed by ```/api/:version/``` where ```:version``` represents the API version in use. For example, in the API v1.0, the login endpoint would be ```/api/v1.0/auth/login```.
+All endpoints must be prefixed by ```/api/:version/``` where ```:version``` represents the API version in use. For example, in the API v1, the login endpoint would be ```/api/v1/auth/login```.
 
 The available endpoints are listed below:
 
